@@ -80,14 +80,20 @@ Check out my certificate here: ${shareUrl}
 
           <Button
             onClick={handleLinkedInShare}
-            className="w-full bg-blue-600 text-white hover:bg-blue-700"
+            className="w-full text-white"
+            style={{ backgroundColor: '#2563EB' }} // ganti bg-blue-600
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1D4ED8')} // ganti bg-blue-700
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#2563EB')}
           >
             Share Certificate as Post on LinkedIn
           </Button>
 
           <Button
             onClick={handleLinkedInAddLicense}
-            className="w-full bg-green-600 text-white hover:bg-green-700"
+            className="w-full text-white"
+            style={{ backgroundColor: '#16A34A' }} // ganti bg-green-600
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#15803D')} // ganti bg-green-700
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#16A34A')}
           >
             Add Certificate to LinkedIn Profile
           </Button>

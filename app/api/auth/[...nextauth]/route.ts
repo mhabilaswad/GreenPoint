@@ -1,5 +1,5 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import connectDB from '../../../lib/mongodb';
 import User from '../../../models/User';
 import bcrypt from 'bcryptjs';
@@ -7,41 +7,48 @@ import bcrypt from 'bcryptjs';
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         try {
           if (!credentials) {
-            console.log("No credentials provided");
+            console.log('No credentials provided');
             return null;
           }
 
           await connectDB();
-          console.log("Connected to database for sign-in");
+          console.log('Connected to database for sign-in');
 
           const user = await User.findOne({ email: credentials.email });
           if (!user) {
-            console.log("No user found with this email");
+            console.log('No user found with this email');
             return null;
           }
 
           const isValidPassword = await bcrypt.compare(credentials.password, user.password);
           if (!isValidPassword) {
-            console.log("Invalid password");
+            console.log('Invalid password');
             return null;
           }
 
-          console.log("Authentication successful");
+          console.log('Authentication successful');
+
+          // Mengembalikan objek user dengan properti yang sesuai dengan tipe Session
           return {
             id: user._id.toString(),
             email: user.email,
             name: user.name,
+            role: user.role,   // pastikan role ada
+            points: user.points,
+            nickname: user.nickname,
+            linkedin: user.linkedin,
+            github: user.github,
           };
         } catch (error) {
-          console.error("Authentication error:", error);
+          console.error('Authentication error:', error);
           return null;
         }
       },
@@ -51,17 +58,34 @@ const handler = NextAuth({
     signIn: '/auth/signin',
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        // Mengisi properti token dengan data yang sesuai
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role;
+        token.points = user.points;
+        token.nickname = user.nickname;
+        token.linkedin = user.linkedin;
+        token.github = user.github;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Mengambil data dari token dan memasukkannya ke dalam session
+      session.user.id = token.id;
+      session.user.email = token.email;
+      session.user.name = token.name;
+      session.user.role = token.role;
+      session.user.points = token.points;
+      session.user.nickname = token.nickname;
+      session.user.linkedin = token.linkedin;
+      session.user.github = token.github;
+      return session;
     },
   },
 });

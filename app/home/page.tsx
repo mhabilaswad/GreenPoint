@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type Image = {
@@ -11,41 +10,34 @@ type Image = {
   description: string;
 };
 
-export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q")?.toLowerCase();
+export default function HomePage() {
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
 
   useEffect(() => {
     const loadImages = async () => {
-      if (query) {
-        setLoading(true);
+      setLoading(true);
 
-        // Mengambil data gambar dari API berdasarkan query
-        const response = await fetch(`/api/searching?q=${query}`);
-        const data = await response.json();
+      // Mengambil semua gambar dari API tanpa query
+      const response = await fetch("/api/home-api");
+      const data = await response.json();
 
-        // Memetakan data yang diterima ke dalam format yang sesuai
-        const imagesData: Image[] = data.map((item: any) => ({
-          url: item.image,  // Gambar Base64 yang diterima
-          name: item.name,
-          title: item.title, // Judul gambar
-          likes: item.likes || 0, // Inisialisasi jumlah like
-          description: item.description,
-        }));
+      // Memetakan data yang diterima ke dalam format yang sesuai
+      const imagesData: Image[] = data.map((item: any) => ({
+        url: item.image,  // Gambar Base64 yang diterima
+        name: item.name,
+        title: item.title, // Judul gambar
+        likes: item.likes || 0, // Inisialisasi jumlah like
+        description: item.description,
+      }));
 
-        setImages(imagesData);
-        setLoading(false);
-      } else {
-        setImages([]);
-        setLoading(false);
-      }
+      setImages(imagesData);
+      setLoading(false);
     };
 
     loadImages();
-  }, [query]);
+  }, []);
 
   const handleLike = async (imageUrl: string) => {
     const res = await fetch("/api/like-image", {
@@ -73,9 +65,7 @@ export default function SearchPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-4">
-        Search Results for: <span className="text-green-600">{query}</span>
-      </h2>
+      <h2 className="text-3xl font-bold mb-4">Home</h2>
 
       {loading ? (
         <p>Loading images...</p>
@@ -111,7 +101,7 @@ export default function SearchPage() {
           ))}
         </div>
       ) : (
-        <p className="text-gray-500">No images found for "{query}".</p>
+        <p className="text-gray-500">No images available.</p>
       )}
 
       {/* Modal */}
@@ -131,7 +121,7 @@ export default function SearchPage() {
 
             {/* Gambar */}
             <div className="w-full h-[400px] flex items-center justify-center bg-gray-100 rounded shadow-lg">
-            <img
+              <img
                 src={selectedImage.url}
                 alt={selectedImage.name}
                 className="w-full h-full object-contain"

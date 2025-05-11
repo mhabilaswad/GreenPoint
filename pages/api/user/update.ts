@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       // Update the user in the database
       const updatedUser = await prisma.user.update({
-        where: { email: session.user.email }, // Assuming email is unique identifier
+        where: { email: session.user.email }, // email is unique identifier
         data: {
           name,
           nickname,

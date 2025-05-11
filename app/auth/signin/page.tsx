@@ -34,12 +34,12 @@ export default function SignIn() {
         variant: "destructive",
       });
     } else {
-      console.log("Sign-in successful, redirecting to dashboard...");
+      console.log("Sign-in successful, redirecting to homepage...");
       toast({
         title: "Success",
-        description: "Sign-in successful! Redirecting to dashboard...",
+        description: "Sign-in successful! Redirecting to homepage...",
       });
-      router.push("/dashboard");
+      router.push("/home");
     }
   }
 

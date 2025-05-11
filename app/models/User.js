@@ -30,14 +30,18 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  images: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Image',
-  }],
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  role: {
+    type: String,
+    default: 'user',
+  },
+    profile: {
+    type: String,
+    default: '',
+  }
 });
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

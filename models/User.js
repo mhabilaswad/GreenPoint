@@ -14,9 +14,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
   },
-  nickname: {
+  tier: {
     type: String,
-    default: '',
+    default: 'New Gardener',
   },
   linkedin: {
     type: String,

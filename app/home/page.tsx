@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 
 type Image = {
+  tier: string;
+  github: string;
+  linkedin: string;
   url: string; // String Base64 image
   title: string;
   name: string;
@@ -16,10 +19,11 @@ export default function HomePage() {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
 
   useEffect(() => {
+    // Mengambil data gambar dan informasi pengguna dari API
     const loadImages = async () => {
       setLoading(true);
 
-      // Mengambil semua gambar dari API tanpa query
+      // Mengambil semua gambar dan informasi pengguna dari API
       const response = await fetch("/api/home-api");
       const data = await response.json();
 
@@ -30,11 +34,16 @@ export default function HomePage() {
         title: item.title, // Judul gambar
         likes: item.likes || 0, // Inisialisasi jumlah like
         description: item.description,
+        email: item.email, // Menyertakan email pengguna yang meng-upload
+        linkedin: item.userInfo.linkedin, // Menyertakan linkedin pengguna
+        github: item.userInfo.github, // Menyertakan github pengguna
+        tier: item.userInfo.tier,
       }));
 
       setImages(imagesData);
       setLoading(false);
     };
+
 
     loadImages();
   }, []);
@@ -116,7 +125,7 @@ export default function HomePage() {
           >
             {/* Judul */}
             <p className="text-center text-xl font-bold text-black mb-2">
-              {selectedImage.name}
+              {selectedImage.title}
             </p>
 
             {/* Gambar */}
@@ -143,13 +152,58 @@ export default function HomePage() {
 
               {/* Info User + Deskripsi */}
               <div className="flex flex-col gap-1 w-full">
-                <p className="font-bold text-black">{selectedImage.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-black">{selectedImage.name}</p>
+                  {selectedImage.tier && (
+                    <span
+                      className={`font-bold ${selectedImage.tier === "New Gardener"
+                          ? "text-[#808080]"
+                          : selectedImage.tier === "Beginner Gardener"
+                            ? "text-[#FFD700]" // Kuning
+                            : selectedImage.tier === "Intermediate Gardener"
+                              ? "text-[#32CD32]" // Hijau
+                              : selectedImage.tier === "Expert Gardener"
+                                ? "text-[#1E90FF]" // Biru
+                                : selectedImage.tier === "Master Gardener"
+                                  ? "text-[#DAA520]" // Emas
+                                  : "text-black"
+                        }`}
+                    >
+                      {selectedImage.tier}
+                    </span>
+                  )}
+                </div>
+
+                {/* Tampilkan LinkedIn dan GitHub jika ada */}
+                <div className="flex gap-2">
+                  {selectedImage.linkedin && (
+                    <a
+                      href={selectedImage.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#3B82F6]"
+                    >
+                      LinkedIn
+                    </a>
+                  )}
+                  {selectedImage.github && (
+                    <a
+                      href={selectedImage.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#3B82F6]"
+                    >
+                      GitHub
+                    </a>
+                  )}
+                </div>
 
                 {/* Deskripsi scrollable */}
                 <div className="text-gray-700 text-sm max-h-[120px] overflow-y-auto pr-2">
                   {selectedImage.description}
                 </div>
               </div>
+
             </div>
           </div>
         </div>

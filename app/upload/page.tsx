@@ -20,6 +20,10 @@ export default function Upload() {
   const [confidenceScore, setConfidenceScore] = useState<number | null>(null);
   const router = useRouter();
 
+  const [predictedClass, setPredictedClass] = useState<string | null>(null);
+  const [predictionLoading, setPredictionLoading] = useState(false);
+  const [predictionError, setPredictionError] = useState<string | null>(null);
+
   // Cek jika session ada, ambil email pengguna dari session
   const userEmail = session?.user?.email || "";
   const userName = session?.user?.name || "";
@@ -63,10 +67,10 @@ export default function Upload() {
   }, [userEmail]);
 
   const classifications = [
-    { message: "Plants not detected!", points: 0, color: "red" },
-    { message: "Your Plant is wilting!", points: 50, color: "red" },
-    { message: "Your Plant seems Good!", points: 75, color: "yellow" },
-    { message: "Your Plant is Excellent!", points: 100, color: "green" },
+    { value: "Plants not detected!", message: "Plants not detected!", points: 0, color: "red" },
+    { value: "Your Plant is wilting!",message: "Your Plant is wilting!", points: 50, color: "red" },
+    { value: "Your Plant seems Good!",message: "Your Plant seems Good!", points: 75, color: "yellow" },
+    { value: "Your Plant is Excellent!",message: "Your Plant is Excellent!", points: 100, color: "green" },
   ];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +90,53 @@ export default function Upload() {
     });
   };
 
+const handlePredict = async (): Promise<{ predicted: string; confidence: number } | null> => {
+  if (!file) {
+    toast({
+      title: "No Image Selected",
+      description: "Please upload an image before predicting.",
+      variant: "destructive",
+    });
+    return null;
+  }
+
+  setPredictionLoading(true);
+  setPredictionError(null);
+  setPredictedClass(null);
+  setConfidenceScore(null);
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("https://greenpoint-cnn-model-production.up.railway.app/predict", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.message || "Prediction API error");
+    }
+
+    const data = await res.json();
+    const predicted = data.class;
+    const confidence = Math.round(data.confidence * 100);
+
+    setPredictedClass(predicted);
+    setConfidenceScore(confidence);
+
+    return { predicted, confidence }; // ⬅️ kembalikan hasil prediksi langsung
+  } catch (error: any) {
+    setPredictionError(error.message || "Unknown prediction error");
+    return null;
+  } finally {
+    setPredictionLoading(false);
+  }
+};
+
+
+  // Untuk handle upload
   const handleUpload = async () => {
     if (!file || !plantName || !plantDescription) {
       toast({
@@ -103,58 +154,80 @@ export default function Upload() {
       });
       return;
     }
-  
+
     setLoading(true);
     setConfidenceScore(null);
-  
+
     const base64Image = await convertToBase64(file);
-  
+
     try {
-      const uploadRes = await fetch("/api/upload-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: userName,
-          email: userEmail, // Menambahkan email ke request body
-          title: plantName,
-          description: plantDescription,
-          image: base64Image,
-        }),
-      });
-  
-      const uploadData = await uploadRes.json();
-  
-      if (!uploadRes.ok) {
-        throw new Error(uploadData.message || "Image upload failed");
+  const result = await handlePredict();
+
+  if (!result) return; // jika error
+
+  const { predicted, confidence } = result;
+
+  if (predicted === "Plants not detected!") {
+    toast({
+      title: "Prediction",
+      description: "Plants not detected! Image not uploaded.",
+      variant: "destructive",
+    });
+    return; // stop upload
+  }
+
+  // ✅ lanjut upload karena tanaman terdeteksi
+  const uploadRes = await fetch("/api/upload-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: userName,
+      email: userEmail,
+      title: plantName,
+      description: plantDescription,
+      image: base64Image,
+    }),
+  });
+
+  const uploadData = await uploadRes.json();
+
+  if (!uploadRes.ok) {
+    throw new Error(uploadData.message || "Image upload failed");
+  }
+
+      const selectedClassification = classifications.find(
+        (c) => c.message === predictedClass
+      );
+
+      if (!selectedClassification) {
+        setPredictionError("Prediction result did not match any classification.");
+        return;
       }
-  
-      const randomIndex = Math.floor(Math.random() * classifications.length);
-      const selectedClassification = classifications[randomIndex];
+
       const addedPoints = selectedClassification.points;
-  
-      // Tambahkan pengecekan jika points yang ditambahkan lebih besar dari 0
+
       if (addedPoints > 0) {
         const updated = await updatePointsInDB(addedPoints);
-  
+
         if (updated) {
           await fetchUserPoints();
           setLastClassification(selectedClassification.message);
           setLastPoints(addedPoints);
           const randomConfidence = Math.floor(Math.random() * 51) + 50;
           setConfidenceScore(randomConfidence);
-  
+
           toast({
             title: "Result",
             description: `${selectedClassification.message} (+${addedPoints} points)`,
             variant: selectedClassification.color === "red" ? "destructive" : "default",
           });
-  
+
           if (points + addedPoints >= 500) {
             router.push("/certification");
           }
         }
       }
-  
+
       setFile(null);
       setPreviewImage(null);
       setPlantName("");
@@ -168,7 +241,7 @@ export default function Upload() {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
@@ -216,18 +289,25 @@ export default function Upload() {
         <Button onClick={handleUpload} className="w-full mb-4" disabled={loading}>
           {loading ? "Uploading..." : "Upload"}
         </Button>
+        {predictionLoading && <p>Predicting...</p>}
+
+        {predictedClass && confidenceScore !== null && (
+          <div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
+            <strong>Prediction Result:</strong> Class {predictedClass}, Confidence {confidenceScore}%
+          </div>
+        )}
 
         <p>Total Points: {points}</p>
 
         {lastClassification && (
-          <div className="mt-2 text-center">
-            <p className="text-lg font-semibold">You gained {lastPoints} points!</p>
-            <p className="text-md text-gray-700 italic">{lastClassification}</p>
+          <div className="mt-4 text-center">
+            <p className="text-xl font-bold text-green-700">You gained {lastPoints} points!</p>
+            <p className="text-md text-gray-700 italic mt-1">{lastClassification}</p>
           </div>
         )}
 
         {confidenceScore !== null && (
-          <div className="text-center mb-10 mt-4">
+          <div className="text-center mt-6 mb-10">
             <h4 className="text-lg font-semibold mb-2">Detection Confidence</h4>
             <div className="w-full md:w-1/2 mx-auto bg-gray-200 rounded-full h-4">
               <div

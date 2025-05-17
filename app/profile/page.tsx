@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 type Image = {
+  id: string;
   url: string;
   title: string;
   name: string;
@@ -33,6 +34,7 @@ export default function Profile() {
         const data = await response.json();
 
         const imagesData: Image[] = data.map((item: any) => ({
+          id: item._id,
           url: item.image,
           name: item.name,
           title: item.title,
@@ -68,29 +70,35 @@ export default function Profile() {
     setEditedDescription("");
   };
 
-  const handleSave = async (url: string) => {
-    const response = await fetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url,
-        title: editedTitle,
-        description: editedDescription,
-      }),
-    });
+const handleSave = async (_id: string) => {
+  console.log("Sending PUT request with:", {
+    _id,
+    title: editedTitle,
+    description: editedDescription,
+    email: session?.user?.email,
+  });
 
-    if (response.ok) {
-      const updatedImages = images.map((img) =>
-        img.url === url
-          ? { ...img, title: editedTitle, description: editedDescription }
-          : img
-      );
-      setImages(updatedImages);
-      handleCancel();
-    } else {
-      alert("Failed to update image");
-    }
-  };
+  const response = await fetch("/api/profile", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      _id,
+      title: editedTitle,
+      description: editedDescription,
+      email: session?.user?.email,
+    }),
+  });
+
+  if (response.ok) {
+    const updatedImages = images.map((img) =>
+      img.id === _id ? { ...img, title: editedTitle, description: editedDescription } : img
+    );
+    setImages(updatedImages);
+    handleCancel();
+  } else {
+    alert("Failed to update image");
+  }
+};
 
   if (status === "loading") return <div>Loading...</div>;
 
@@ -117,8 +125,8 @@ export default function Profile() {
               </div>
             </div>
             <div className="mt-4">
-              <h3 className="text-md font-medium">Nickname:</h3>
-              <p>{(session?.user as any)?.nickname || "No nickname set"}</p>
+              <h3 className="text-md font-medium">Tier:</h3>
+              <p>{(session?.user as any)?.tier || "No tier set"}</p>
             </div>
             <div className="mt-4">
               <h3 className="text-md font-medium">LinkedIn:</h3>
@@ -144,8 +152,8 @@ export default function Profile() {
           <p>Loading images...</p>
         ) : images.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {images.map((image, index) => (
-              <div key={index} className="border rounded-lg shadow overflow-hidden">
+            {images.map((image) => (
+              <div key={image.id} className="border rounded-lg shadow overflow-hidden">
                 <img
                   src={image.url}
                   alt={image.name}
@@ -157,21 +165,22 @@ export default function Profile() {
                       <input
                         value={editedTitle}
                         onChange={(e) => setEditedTitle(e.target.value)}
-                        className="w-full mb-2 p-2 text-black rounded"
+                        className="w-full mb-2 p-2 text-white rounded"
                         placeholder="Edit Title"
                       />
                       <textarea
                         value={editedDescription}
                         onChange={(e) => setEditedDescription(e.target.value)}
-                        className="w-full mb-2 p-2 text-black rounded"
+                        className="w-full mb-2 p-2 text-white rounded"
                         placeholder="Edit Description"
                       />
                       <div className="flex justify-between">
-                        <Button onClick={() => handleSave(image.url)}>Save</Button>
+                        <Button onClick={() => handleSave(image.id)}>Save</Button> {/* Ganti url dengan _id */}
                         <Button variant="secondary" onClick={handleCancel}>
                           Cancel
                         </Button>
                       </div>
+
                     </>
                   ) : (
                     <>

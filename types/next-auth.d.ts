@@ -9,7 +9,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       points?: number;
-      nickname?: string | null;
+      tier?: string | null;
       linkedin?: string | null;
       github?: string | null;
     };

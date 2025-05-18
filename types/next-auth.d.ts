@@ -14,4 +14,8 @@ declare module "next-auth" {
       github?: string | null;
     };
   }
+
+  interface User {
+    role?: string;
+  }
 } 

@@ -77,14 +77,14 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       // Mengambil data dari token dan memasukkannya ke dalam session
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.name = token.name;
-      session.user.role = token.role;
+      session.user.id = token.id ?? "";
+      session.user.email = token.email ?? "";
+      session.user.name = token.name ?? "";
+      session.user.role = token.role ?? "";
       session.user.points = token.points;
-      session.user.tier = token.tier;
-      session.user.linkedin = token.linkedin;
-      session.user.github = token.github;
+      session.user.tier = token.tier ?? "";
+      session.user.linkedin = token.linkedin ?? "";
+      session.user.github = token.github ?? "";
       return session;
     },
   },

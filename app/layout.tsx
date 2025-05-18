@@ -5,7 +5,6 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/components/auth-provider';
 import Navbar from '@/components/navbar';
-import PhotosPage from './photos/page';
 import Footer from '@/components/Footer'; // Import the Footer component
 
 const inter = Inter({ subsets: ['latin'] });

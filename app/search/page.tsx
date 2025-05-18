@@ -13,7 +13,7 @@ type Image = {
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q")?.toLowerCase();
+  const query = searchParams?.get("q")?.toLowerCase() ?? "";
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);

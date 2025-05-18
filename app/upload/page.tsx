@@ -295,19 +295,24 @@ export default function Upload() {
 
         {predictedClass && confidenceScore !== null && (() => {
           const resultColor = classifications.find(c => c.value === predictedClass)?.color || "gray";
+
           const colorMap = {
             green: "bg-green-100 text-green-800",
             yellow: "bg-yellow-100 text-yellow-800",
             red: "bg-red-100 text-red-800",
             gray: "bg-gray-100 text-gray-800"
-          };
+          } as const;
+
+          // Beri tahu TypeScript bahwa resultColor adalah salah satu key valid
+          const safeColor = resultColor as keyof typeof colorMap;
 
           return (
-            <div className={`mt-4 p-4 rounded ${colorMap[resultColor]}`}>
+            <div className={`mt-4 p-4 rounded ${colorMap[safeColor]}`}>
               <strong>Prediction Result:</strong> {predictedClass} ({confidenceScore}% confident)
             </div>
           );
         })()}
+
 
 
         <p>Total Points: {points}</p>

@@ -101,7 +101,7 @@ export default function Profile() {
     }
   };
 
-const handleDelete = async (image) => {
+const handleDelete = async (image: { id: any; url?: string; title: any; name?: string; likes?: number; description?: string; }) => {
   const confirmed = window.confirm(`Are you sure you want to delete "${image.title}"?`);
   if (!confirmed) return;
 

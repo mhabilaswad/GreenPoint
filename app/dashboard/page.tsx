@@ -497,7 +497,7 @@ export default function Dashboard() {
                 <div className="flex space-x-4">
                   <Button
                     onClick={handleSaveUser}
-                    className="px-4 py-2 btn-green text-white hover:bg-[#2F855B]"
+                    className="px-4 py-2 bg-green-400 text-white rounded-md hover:bg-green-700"
                   >
                     Save
                   </Button>
@@ -550,7 +550,7 @@ export default function Dashboard() {
                 <div className="flex space-x-4">
                   <Button
                     onClick={handleSaveImage}
-                    className="px-4 py-2 btn-green hover:bg-[#2f855B]"
+                    className="px-4 py-2 bg-green-400 text-white rounded-md hover:bg-green-700"
                   >
                     Save
                   </Button>

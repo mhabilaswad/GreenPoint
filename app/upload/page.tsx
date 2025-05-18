@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";  // Menambahkan useSession dari NextAuth
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 export default function Upload() {
   const { data: session } = useSession();  // Mendapatkan data session
@@ -68,9 +69,9 @@ export default function Upload() {
 
   const classifications = [
     { value: "Plants not detected!", message: "Plants not detected!", points: 0, color: "red" },
-    { value: "Your Plant is wilting!",message: "Your Plant is wilting!", points: 50, color: "red" },
-    { value: "Your Plant seems Good!",message: "Your Plant seems Good!", points: 75, color: "yellow" },
-    { value: "Your Plant is Excellent!",message: "Your Plant is Excellent!", points: 100, color: "green" },
+    { value: "Your Plant is wilting!", message: "Your Plant is wilting!", points: 50, color: "red" },
+    { value: "Your Plant seems Good!", message: "Your Plant seems Good!", points: 75, color: "yellow" },
+    { value: "Your Plant is Excellent!", message: "Your Plant is Excellent!", points: 100, color: "green" },
   ];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,50 +91,50 @@ export default function Upload() {
     });
   };
 
-const handlePredict = async (): Promise<{ predicted: string; confidence: number } | null> => {
-  if (!file) {
-    toast({
-      title: "No Image Selected",
-      description: "Please upload an image before predicting.",
-      variant: "destructive",
-    });
-    return null;
-  }
-
-  setPredictionLoading(true);
-  setPredictionError(null);
-  setPredictedClass(null);
-  setConfidenceScore(null);
-
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("https://greenpoint-cnn-model-production.up.railway.app/predict", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.message || "Prediction API error");
+  const handlePredict = async (): Promise<{ predicted: string; confidence: number } | null> => {
+    if (!file) {
+      toast({
+        title: "No Image Selected",
+        description: "Please upload an image before predicting.",
+        variant: "destructive",
+      });
+      return null;
     }
 
-    const data = await res.json();
-    const predicted = data.class;
-    const confidence = Math.round(data.confidence * 100);
+    setPredictionLoading(true);
+    setPredictionError(null);
+    setPredictedClass(null);
+    setConfidenceScore(null);
 
-    setPredictedClass(predicted);
-    setConfidenceScore(confidence);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    return { predicted, confidence }; // ⬅️ kembalikan hasil prediksi langsung
-  } catch (error: any) {
-    setPredictionError(error.message || "Unknown prediction error");
-    return null;
-  } finally {
-    setPredictionLoading(false);
-  }
-};
+      const res = await fetch("https://greenpoint-cnn-model-production.up.railway.app/predict", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Prediction API error");
+      }
+
+      const data = await res.json();
+      const predicted = data.class;
+      const confidence = Math.round(data.confidence * 100);
+
+      setPredictedClass(predicted);
+      setConfidenceScore(confidence);
+
+      return { predicted, confidence }; // kembalikan hasil prediksi langsung
+    } catch (error: any) {
+      setPredictionError(error.message || "Unknown prediction error");
+      return null;
+    } finally {
+      setPredictionLoading(false);
+    }
+  };
 
 
   // Untuk handle upload
@@ -161,42 +162,47 @@ const handlePredict = async (): Promise<{ predicted: string; confidence: number 
     const base64Image = await convertToBase64(file);
 
     try {
-  const result = await handlePredict();
+      const result = await handlePredict();
 
-  if (!result) return; // jika error
+      if (!result) return; // jika error
 
-  const { predicted, confidence } = result;
+      const { predicted, confidence } = result;
 
-  if (predicted === "Plants not detected!") {
-    toast({
-      title: "Prediction",
-      description: "Plants not detected! Image not uploaded.",
-      variant: "destructive",
-    });
-    return; // stop upload
-  }
+      // simpan hasil prediksi & confidence untuk ditampilkan
+      setPredictedClass(predicted);
+      setConfidenceScore(confidence);
 
-  // ✅ lanjut upload karena tanaman terdeteksi
-  const uploadRes = await fetch("/api/upload-image", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: userName,
-      email: userEmail,
-      title: plantName,
-      description: plantDescription,
-      image: base64Image,
-    }),
-  });
+      if (predicted === "Plants not detected!") {
+        toast({
+          title: "Prediction",
+          description: "Plants not detected! Image not uploaded.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-  const uploadData = await uploadRes.json();
+      // lanjut upload karena tanaman terdeteksi
+      const uploadRes = await fetch("/api/upload-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: userName,
+          email: userEmail,
+          title: plantName,
+          description: plantDescription,
+          image: base64Image,
+        }),
+      });
 
-  if (!uploadRes.ok) {
-    throw new Error(uploadData.message || "Image upload failed");
-  }
+      const uploadData = await uploadRes.json();
 
+      if (!uploadRes.ok) {
+        throw new Error(uploadData.message || "Image upload failed");
+      }
+
+      // klasifikasi berdasarkan hasil predicted
       const selectedClassification = classifications.find(
-        (c) => c.message === predictedClass
+        (c) => c.value === predicted
       );
 
       if (!selectedClassification) {
@@ -210,21 +216,15 @@ const handlePredict = async (): Promise<{ predicted: string; confidence: number 
         const updated = await updatePointsInDB(addedPoints);
 
         if (updated) {
-          await fetchUserPoints();
+          await fetchUserPoints(); // refresh total points
           setLastClassification(selectedClassification.message);
           setLastPoints(addedPoints);
-          const randomConfidence = Math.floor(Math.random() * 51) + 50;
-          setConfidenceScore(randomConfidence);
 
           toast({
             title: "Result",
             description: `${selectedClassification.message} (+${addedPoints} points)`,
             variant: selectedClassification.color === "red" ? "destructive" : "default",
           });
-
-          if (points + addedPoints >= 500) {
-            router.push("/certification");
-          }
         }
       }
 
@@ -232,6 +232,7 @@ const handlePredict = async (): Promise<{ predicted: string; confidence: number 
       setPreviewImage(null);
       setPlantName("");
       setPlantDescription("");
+
     } catch (error: any) {
       toast({
         title: "Upload Error",
@@ -245,10 +246,11 @@ const handlePredict = async (): Promise<{ predicted: string; confidence: number 
 
   return (
     <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
+      <ChatbotWidget />
       <div className="w-full max-w-3xl space-y-4">
         <h2 className="text-3xl font-bold text-center">Upload your plant images to gain points!</h2>
         <p className="text-center text-gray-600 mb-4">
-          Once you upload an image, it will be evaluated by our AI model. You'll earn points, and upon reaching certain milestones, you'll receive a certification!
+          Once you upload an image, it will be evaluated by our AI model.
         </p>
         <div className="text-center text-gray-600 mb-4 space-y-1">
           <p>500 Points → <strong>Beginner Gardener</strong></p>
@@ -291,11 +293,22 @@ const handlePredict = async (): Promise<{ predicted: string; confidence: number 
         </Button>
         {predictionLoading && <p>Predicting...</p>}
 
-        {predictedClass && confidenceScore !== null && (
-          <div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
-            <strong>Prediction Result:</strong> Class {predictedClass}, Confidence {confidenceScore}%
-          </div>
-        )}
+        {predictedClass && confidenceScore !== null && (() => {
+          const resultColor = classifications.find(c => c.value === predictedClass)?.color || "gray";
+          const colorMap = {
+            green: "bg-green-100 text-green-800",
+            yellow: "bg-yellow-100 text-yellow-800",
+            red: "bg-red-100 text-red-800",
+            gray: "bg-gray-100 text-gray-800"
+          };
+
+          return (
+            <div className={`mt-4 p-4 rounded ${colorMap[resultColor]}`}>
+              <strong>Prediction Result:</strong> {predictedClass} ({confidenceScore}% confident)
+            </div>
+          );
+        })()}
+
 
         <p>Total Points: {points}</p>
 

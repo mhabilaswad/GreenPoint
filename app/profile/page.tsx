@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 type Image = {
   id: string;
@@ -70,40 +71,74 @@ export default function Profile() {
     setEditedDescription("");
   };
 
-const handleSave = async (_id: string) => {
-  console.log("Sending PUT request with:", {
-    _id,
-    title: editedTitle,
-    description: editedDescription,
-    email: session?.user?.email,
-  });
-
-  const response = await fetch("/api/profile", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const handleSave = async (_id: string) => {
+    console.log("Sending PUT request with:", {
       _id,
       title: editedTitle,
       description: editedDescription,
       email: session?.user?.email,
-    }),
-  });
+    });
 
-  if (response.ok) {
-    const updatedImages = images.map((img) =>
-      img.id === _id ? { ...img, title: editedTitle, description: editedDescription } : img
-    );
-    setImages(updatedImages);
-    handleCancel();
-  } else {
-    alert("Failed to update image");
+    const response = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        _id,
+        title: editedTitle,
+        description: editedDescription,
+        email: session?.user?.email,
+      }),
+    });
+
+    if (response.ok) {
+      const updatedImages = images.map((img) =>
+        img.id === _id ? { ...img, title: editedTitle, description: editedDescription } : img
+      );
+      setImages(updatedImages);
+      handleCancel();
+    } else {
+      alert("Failed to update image");
+    }
+  };
+
+const handleDelete = async (image) => {
+  const confirmed = window.confirm(`Are you sure you want to delete "${image.title}"?`);
+  if (!confirmed) return;
+
+  try {
+    console.log("Deleting image with _id:", image.id); // ganti ._id jadi .id
+    console.log("Email:", session?.user?.email);
+
+    const res = await fetch("/api/profile", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        _id: image.id, // ganti ._id jadi .id
+        email: session?.user?.email
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("Image deleted!");
+      setImages((prev) => prev.filter((img) => img.id !== image.id)); // ganti ._id jadi .id
+    } else {
+      alert(data.error || "Failed to delete image.");
+    }
+  } catch (err) {
+    console.error("Error deleting image:", err);
+    alert("Server error.");
   }
 };
+
 
   if (status === "loading") return <div>Loading...</div>;
 
   return (
     <div className="container mx-auto flex flex-col items-center min-h-[calc(100vh-4rem)] py-8 px-4">
+      <ChatbotWidget />
       <Card className="w-full max-w-5xl">
         <CardHeader>
           <CardTitle>Profile</CardTitle>
@@ -127,6 +162,10 @@ const handleSave = async (_id: string) => {
             <div className="mt-4">
               <h3 className="text-md font-medium">Tier:</h3>
               <p>{(session?.user as any)?.tier || "No tier set"}</p>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-md font-medium">Point:</h3>
+              <p>{(session?.user as any)?.points || "-"}</p>
             </div>
             <div className="mt-4">
               <h3 className="text-md font-medium">LinkedIn:</h3>
@@ -198,10 +237,18 @@ const handleSave = async (_id: string) => {
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="mt-2"
+                        className="mt-2 mr-1"
                         onClick={() => handleEdit(image)}
                       >
                         Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="mt-2"
+                        onClick={() => handleDelete(image)}
+                      >
+                        Delete
                       </Button>
                     </>
                   )}

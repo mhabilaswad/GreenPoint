@@ -1,26 +1,25 @@
 // app/api/searching/route.ts
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Image from '../../models/Image'; // Sesuaikan dengan model Image
+import Image from '../../models/Image';
 
 export async function GET(request: Request) {
   try {
-    await connectDB(); // Pastikan koneksi ke database berhasil
+    await connectDB();
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q')?.toLowerCase() || '';
+    const regex = new RegExp(query, 'i'); // Case-insensitive regex
 
-    // Membuat regex untuk pencarian yang case-insensitive
-    const regex = new RegExp(query, 'i'); // Case insensitive
-
-    // Mencari gambar dengan judul yang sesuai dengan query
+    // Cari berdasarkan title ATAU name (yang disimpan langsung di Image)
     const hasilPencarian = await Image.find({
-      title: { $regex: regex }, // Pencarian berdasarkan 'title'
-    }).limit(5); // Limit jumlah gambar yang ditampilkan
+      $or: [
+        { title: { $regex: regex } },
+        { name: { $regex: regex } },
+      ],
+    }).limit(5);
 
     console.log("Hasil pencarian gambar:", hasilPencarian);
-
-    // Mengirimkan hasil pencarian sebagai respons
     return NextResponse.json(hasilPencarian);
   } catch (error) {
     console.error('Error searching images:', error);

@@ -7,11 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // State untuk toggle show/hide password
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,17 +70,30 @@ export default function SignIn() {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
               <Input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute top-9 right-3 inline-flex items-center justify-center focus:outline-none"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}

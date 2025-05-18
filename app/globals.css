@@ -80,3 +80,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.btn-green {
+  @apply px-4 py-2 bg-[#38A168] text-white rounded-md;
+}

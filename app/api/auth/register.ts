@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       name,
       email,
       password: hashedPassword,
-      nickname: '',
+      tier: 'New Gardener',
       linkedin: '',
       github: '',
     });

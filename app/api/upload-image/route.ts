@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     // Membuat instance baru dari model Image dan menyimpannya
     const newImage = new Image({
       name,
-      email, // Menyimpan email yang diterima
+      email,
       title,
       description,
       image,

@@ -105,25 +105,31 @@ export default function Dashboard() {
   };
 
 
-  // USER: Create (optional - modal / inline form bisa ditambahkan)
+  // USER: Create
   const handleCreateUser = async () => {
+    const randomDigits = Math.floor(10000000 + Math.random() * 90000000); // 8 digit angka acak
     const newUser = {
       name: "New User",
-      email: "new@example.com",
-      nickname: "newbie",
+      email: `${randomDigits}@gmail.com`,
+      tier: "new Gardener",
       linkedin: "",
       github: "",
       points: 0,
       role: "user",
+      password: "defaultPassword123" // tambahkan ini
     };
 
+
     try {
-      const res = await fetch("/api/admin/user", {
+      const res = await fetch("/api/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify({
+          type: "user",
+          data: newUser,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to create user");
@@ -195,12 +201,15 @@ export default function Dashboard() {
     };
 
     try {
-      const res = await fetch("/api/admin/image", {
+      const res = await fetch("/api/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newImage),
+        body: JSON.stringify({
+          type: "image",
+          data: newImage,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to create image");
@@ -219,7 +228,7 @@ export default function Dashboard() {
 
       {/* Users Section */}
       <div className="mb-10">
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Users</h2>
           <Button variant="default" onClick={handleCreateUser}>+ Create</Button>
         </div>
@@ -228,7 +237,7 @@ export default function Dashboard() {
             <tr>
               <th className="border px-2 py-1">Name</th>
               <th className="border px-2 py-1">Email</th>
-              <th className="border px-2 py-1">Nickname</th>
+              <th className="border px-2 py-1">Tier</th>
               <th className="border px-2 py-1">LinkedIn</th>
               <th className="border px-2 py-1">GitHub</th>
               <th className="border px-2 py-1">Points</th>
@@ -243,7 +252,7 @@ export default function Dashboard() {
                 <tr key={user._id}>
                   <td className="border px-2 py-1">{truncate(user.name, 20)}</td>
                   <td className="border px-2 py-1">{truncate(user.email, 20)}</td>
-                  <td className="border px-2 py-1">{truncate(user.nickname, 20)}</td>
+                  <td className="border px-2 py-1">{truncate(user.tier, 20)}</td>
                   <td className="border px-2 py-1">{truncate(user.linkedin, 20)}</td>
                   <td className="border px-2 py-1">{truncate(user.github, 20)}</td>
                   <td className="border px-2 py-1">{user.points}</td>
@@ -279,7 +288,7 @@ export default function Dashboard() {
 
       {/* Images Section */}
       <div>
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Images</h2>
           <Button variant="default" onClick={handleCreateImage}>+ Create</Button>
         </div>
@@ -424,12 +433,23 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="nickname" className="block text-sm font-medium text-gray-700">Nickname</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                   <input
-                    id="nickname"
+                    id="email"
                     type="text"
-                    value={editingUserData.nickname || ""}
-                    onChange={(e) => setEditingUserData({ ...editingUserData, nickname: e.target.value })}
+                    value={editingUserData.email || ""}
+                    onChange={(e) => setEditingUserData({ ...editingUserData, email: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label htmlFor="tier" className="block text-sm font-medium text-gray-700">Tier</label>
+                  <input
+                    id="tier"
+                    type="text"
+                    value={editingUserData.tier || ""}
+                    onChange={(e) => setEditingUserData({ ...editingUserData, tier: e.target.value })}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -470,7 +490,7 @@ export default function Dashboard() {
                 <div className="flex space-x-4">
                   <Button
                     onClick={handleSaveUser}
-                    className="px-4 py-2 bg-[#38a169] text-white rounded-md hover:bg-[#2f855a]"
+                    className="px-4 py-2 bg-[#38A168] text-white rounded-md hover:bg-[#2f855B]"
                   >
                     Save
                   </Button>
@@ -523,7 +543,7 @@ export default function Dashboard() {
                 <div className="flex space-x-4">
                   <Button
                     onClick={handleSaveImage}
-                    className="px-4 py-2 bg-[#38a169] text-white rounded-md hover:bg-[#2f855a]"
+                    className="px-4 py-2 bg-[#38A169] text-white rounded-md hover:bg-[#2f855A]"
                   >
                     Save
                   </Button>

@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { name, nickname, linkedin, github } = req.body;
+    const { name, tier, linkedin, github } = req.body;
 
     try {
       // Update the user in the database
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { email: session.user.email }, // email is unique identifier
         data: {
           name,
-          nickname,
+          tier,
           linkedin,
           github,
         },

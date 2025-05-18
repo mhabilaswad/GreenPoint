@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Image from "../../models/Image";
 
+// Mengambil gambar berdasarkan email
 export async function GET(request: Request) {
   try {
     await connectDB();
@@ -14,6 +15,9 @@ export async function GET(request: Request) {
     }
 
     const images = await Image.find({ email }).limit(10);
+
+    console.log("Hasil pencarian gambar berdasarkan email:", images); // ✅ Tambahkan ini
+
     return NextResponse.json(images);
   } catch (error) {
     console.error("Error fetching user images:", error);
@@ -21,18 +25,20 @@ export async function GET(request: Request) {
   }
 }
 
-// Tambahkan handler PUT di bawah GET
+// PUT untuk mengedit gambar berdasarkan _id
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
-    const { url, title, description } = await request.json();
+    const { _id, title, description, email } = await request.json();
 
-    if (!url || !title || !description) {
+    console.log("Received data:", { _id, title, description, email }); // Debugging log
+
+    if (!_id || !title || !description || !email) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     const updated = await Image.findOneAndUpdate(
-      { url },
+      { _id: _id, email }, // Mencari gambar berdasarkan _id dan email
       { $set: { title, description } },
       { new: true }
     );

@@ -43,7 +43,7 @@ const handler = NextAuth({
             name: user.name,
             role: user.role,   // pastikan role ada
             points: user.points,
-            nickname: user.nickname,
+            tier: user.tier,
             linkedin: user.linkedin,
             github: user.github,
           };
@@ -69,7 +69,7 @@ const handler = NextAuth({
         token.name = user.name;
         token.role = user.role;
         token.points = user.points;
-        token.nickname = user.nickname;
+        token.tier = user.tier;
         token.linkedin = user.linkedin;
         token.github = user.github;
       }
@@ -82,7 +82,7 @@ const handler = NextAuth({
       session.user.name = token.name;
       session.user.role = token.role;
       session.user.points = token.points;
-      session.user.nickname = token.nickname;
+      session.user.tier = token.tier;
       session.user.linkedin = token.linkedin;
       session.user.github = token.github;
       return session;

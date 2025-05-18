@@ -41,7 +41,7 @@ const handler = NextAuth({
             id: user._id.toString(),
             email: user.email,
             name: user.name,
-            role: user.role,   // pastikan role ada
+            role: user.role,  
             points: user.points,
             tier: user.tier,
             linkedin: user.linkedin,

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 type Image = {
+  points: number;
   tier: string;
   github: string;
   linkedin: string;
@@ -38,6 +40,7 @@ export default function HomePage() {
         linkedin: item.userInfo.linkedin, // Menyertakan linkedin pengguna
         github: item.userInfo.github, // Menyertakan github pengguna
         tier: item.userInfo.tier,
+        points: item.userInfo.points
       }));
 
       setImages(imagesData);
@@ -74,6 +77,7 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <ChatbotWidget />
       <h2 className="text-3xl font-bold mb-4">Home</h2>
 
       {loading ? (
@@ -155,22 +159,42 @@ export default function HomePage() {
                 <div className="flex items-center gap-2">
                   <p className="font-bold text-black">{selectedImage.name}</p>
                   {selectedImage.tier && (
-                    <span
-                      className={`font-bold ${selectedImage.tier === "New Gardener"
-                          ? "text-[#808080]"
-                          : selectedImage.tier === "Beginner Gardener"
-                            ? "text-[#FFD700]" // Kuning
-                            : selectedImage.tier === "Intermediate Gardener"
-                              ? "text-[#32CD32]" // Hijau
-                              : selectedImage.tier === "Expert Gardener"
-                                ? "text-[#1E90FF]" // Biru
-                                : selectedImage.tier === "Master Gardener"
-                                  ? "text-[#DAA520]" // Emas
-                                  : "text-black"
-                        }`}
-                    >
-                      {selectedImage.tier}
-                    </span>
+                    <>
+                      <span
+                        className={`font-bold ${selectedImage.tier === "New Gardener"
+                            ? "text-[#808080]"
+                            : selectedImage.tier === "Beginner Gardener"
+                              ? "text-[#FFD700]"
+                              : selectedImage.tier === "Intermediate Gardener"
+                                ? "text-[#32CD32]"
+                                : selectedImage.tier === "Expert Gardener"
+                                  ? "text-[#1E90FF]"
+                                  : selectedImage.tier === "Master Gardener"
+                                    ? "text-[#DAA520]"
+                                    : "text-black"
+                          }`}
+                      >
+                        {selectedImage.tier}
+                      </span>
+                      {selectedImage.points !== undefined && (
+                        <span
+                          className={`font-semibold ${selectedImage.tier === "New Gardener"
+                              ? "text-[#808080]"
+                              : selectedImage.tier === "Beginner Gardener"
+                                ? "text-[#FFD700]"
+                                : selectedImage.tier === "Intermediate Gardener"
+                                  ? "text-[#32CD32]"
+                                  : selectedImage.tier === "Expert Gardener"
+                                    ? "text-[#1E90FF]"
+                                    : selectedImage.tier === "Master Gardener"
+                                      ? "text-[#DAA520]"
+                                      : "text-black"
+                            }`}
+                        >
+                          ({selectedImage.points} Point)
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
 

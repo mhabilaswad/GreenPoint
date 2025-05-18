@@ -53,3 +53,28 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Failed to update image" }, { status: 500 });
   }
 }
+
+// DELETE untuk menghapus gambar berdasarkan _id dan email
+export async function DELETE(request: NextRequest) {
+  try {
+    await connectDB();
+    const { _id, email } = await request.json();
+
+    console.log("Received for delete:", { _id, email });
+
+    if (!_id || !email) {
+      return NextResponse.json({ error: "Image _id and email are required" }, { status: 400 });
+    }
+
+    const deleted = await Image.findOneAndDelete({ _id, email });
+
+    if (!deleted) {
+      return NextResponse.json({ error: "Image not found or unauthorized" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Image deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting image:", error);
+    return NextResponse.json({ error: "Failed to delete image" }, { status: 500 });
+  }
+}

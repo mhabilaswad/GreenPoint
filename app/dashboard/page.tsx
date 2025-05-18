@@ -445,14 +445,21 @@ export default function Dashboard() {
 
                 <div className="mb-4">
                   <label htmlFor="tier" className="block text-sm font-medium text-gray-700">Tier</label>
-                  <input
+                  <select
                     id="tier"
-                    type="text"
                     value={editingUserData.tier || ""}
-                    onChange={(e) => setEditingUserData({ ...editingUserData, tier: e.target.value })}
+                    onChange={(e) =>
+                      setEditingUserData({ ...editingUserData, tier: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    <option value="Beginner Gardener">Beginner Gardener</option>
+                    <option value="Intermediate Gardener">Intermediate Gardener</option>
+                    <option value="Expert Gardener">Expert Gardener</option>
+                    <option value="Master Gardener">Master Gardener</option>
+                  </select>
                 </div>
+
 
                 <div className="mb-4">
                   <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700">LinkedIn</label>
@@ -490,7 +497,7 @@ export default function Dashboard() {
                 <div className="flex space-x-4">
                   <Button
                     onClick={handleSaveUser}
-                    className="px-4 py-2 bg-[#38A168] text-white rounded-md hover:bg-[#2f855B]"
+                    className="px-4 py-2 btn-green text-white hover:bg-[#2F855B]"
                   >
                     Save
                   </Button>
@@ -543,7 +550,7 @@ export default function Dashboard() {
                 <div className="flex space-x-4">
                   <Button
                     onClick={handleSaveImage}
-                    className="px-4 py-2 bg-[#38A169] text-white rounded-md hover:bg-[#2f855A]"
+                    className="px-4 py-2 btn-green hover:bg-[#2f855B]"
                   >
                     Save
                   </Button>

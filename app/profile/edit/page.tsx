@@ -107,24 +107,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">Email</label>
-              <input
-                type="email"
-                value={session?.user.email || ""}
-                readOnly
-                className="border rounded p-2 w-full bg-gray cursor-not-allowed"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Tier</label>
-              <input
-                type="tier"
-                value={session?.user.tier || ""}
-                readOnly
-                className="border rounded p-2 w-full bg-gray cursor-not-allowed"
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium">LinkedIn</label>
               <input
                 type="text"

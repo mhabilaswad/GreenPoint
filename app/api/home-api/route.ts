@@ -31,6 +31,7 @@ export async function GET(request: Request) {
           "userInfo.linkedin": 1, // Menambahkan linkedin pengguna
           "userInfo.github": 1, // Menambahkan github pengguna
           "userInfo.tier": 1, // Menambahkan tier pengguna
+          "userInfo.points": 1, // Menambahkan point pengguna
         },
       },
     ]);

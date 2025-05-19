@@ -8,7 +8,19 @@ export async function GET(request: Request) {
   try {
     await connectDB();
 
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get("q")?.toLowerCase() || "";
+    const regex = new RegExp(query, "i"); // Case-insensitive search
+
     const hasilPencarian = await Image.aggregate([
+      {
+        $match: {
+          $or: [
+            { title: { $regex: regex } },
+            { name: { $regex: regex } },
+          ],
+        },
+      },
       {
         $lookup: {
           from: "users",
@@ -34,18 +46,21 @@ export async function GET(request: Request) {
           "userInfo.points": 1,
         },
       },
+      {
+        $limit: query ? 5 : 1000, // jika ada query, batasi hasil seperti search
+      },
     ]);
 
-    console.log("Hasil gambar dan pengguna:", hasilPencarian);
+    console.log("Hasil gabungan image + user:", hasilPencarian);
 
     return new NextResponse(JSON.stringify(hasilPencarian), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store", // penting agar tidak di-cache
+        "Cache-Control": "no-store",
       },
     });
   } catch (error) {
-    console.error("Error fetching images and user data:", error);
+    console.error("Error fetching data:", error);
     return NextResponse.json(
       { error: "Failed to fetch images and user data" },
       { status: 500 }

@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       "X-Title": "GreenPoint Chatbot", // opsional
     },
     body: JSON.stringify({
-      model: "qwen/qwen3-4b:free",
+      model: "meta-llama/llama-3.3-8b-instruct:free",
       messages: [
         {
           role: "system",

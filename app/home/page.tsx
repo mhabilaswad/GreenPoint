@@ -26,7 +26,10 @@ export default function HomePage() {
       setLoading(true);
 
       // Mengambil semua gambar dan informasi pengguna dari API
-      const response = await fetch("/api/home-api");
+      const response = await fetch("/api/home-api", {
+        cache: "no-store",
+      });
+
       const data = await response.json();
 
       // Memetakan data yang diterima ke dalam format yang sesuai
@@ -162,6 +165,23 @@ export default function HomePage() {
                     <>
                       <span
                         className={`font-bold ${selectedImage.tier === "New Gardener"
+                          ? "text-[#808080]"
+                          : selectedImage.tier === "Beginner Gardener"
+                            ? "text-[#FFD700]"
+                            : selectedImage.tier === "Intermediate Gardener"
+                              ? "text-[#32CD32]"
+                              : selectedImage.tier === "Expert Gardener"
+                                ? "text-[#1E90FF]"
+                                : selectedImage.tier === "Master Gardener"
+                                  ? "text-[#DAA520]"
+                                  : "text-black"
+                          }`}
+                      >
+                        {selectedImage.tier}
+                      </span>
+                      {selectedImage.points !== undefined && (
+                        <span
+                          className={`font-semibold ${selectedImage.tier === "New Gardener"
                             ? "text-[#808080]"
                             : selectedImage.tier === "Beginner Gardener"
                               ? "text-[#FFD700]"
@@ -172,23 +192,6 @@ export default function HomePage() {
                                   : selectedImage.tier === "Master Gardener"
                                     ? "text-[#DAA520]"
                                     : "text-black"
-                          }`}
-                      >
-                        {selectedImage.tier}
-                      </span>
-                      {selectedImage.points !== undefined && (
-                        <span
-                          className={`font-semibold ${selectedImage.tier === "New Gardener"
-                              ? "text-[#808080]"
-                              : selectedImage.tier === "Beginner Gardener"
-                                ? "text-[#FFD700]"
-                                : selectedImage.tier === "Intermediate Gardener"
-                                  ? "text-[#32CD32]"
-                                  : selectedImage.tier === "Expert Gardener"
-                                    ? "text-[#1E90FF]"
-                                    : selectedImage.tier === "Master Gardener"
-                                      ? "text-[#DAA520]"
-                                      : "text-black"
                             }`}
                         >
                           ({selectedImage.points} Point)

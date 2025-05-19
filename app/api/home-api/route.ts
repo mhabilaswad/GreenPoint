@@ -39,7 +39,13 @@ export async function GET(request: Request) {
     console.log("Hasil gambar dan pengguna:", hasilPencarian);
 
     // Mengirimkan hasil gambar dan informasi pengguna sebagai respons
-    return NextResponse.json(hasilPencarian);
+    return new NextResponse(JSON.stringify(hasilPencarian), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store', // Agar tidak cache
+      },
+    });
+
   } catch (error) {
     console.error("Error fetching images and user data:", error);
     return NextResponse.json({ error: "Failed to fetch images and user data" }, { status: 500 });

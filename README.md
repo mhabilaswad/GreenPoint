@@ -35,13 +35,14 @@
 |-------------------------|----------------------------------------------------------------------|
 | Website                 | [GreenPoint on Vercel](https://green-point-ten.vercel.app/)          |
 | CNN Model Repository    | [greenpoint-cnn-model on GitHub](https://github.com/mhabilaswad/greenpoint-cnn-model) |
-| ML Server Deployment    | [CNN Model API on Railway](https://greenpoint-cnn-model-production.up.railway.app/) |
+| ML Server Deployment    | [CNN Model API](https://greenpoint-cnn-model-production.up.railway.app/) from [Railway](https://railway.com/)|
+| ML Model Development    | [Our code at Kaggle](https://www.kaggle.com/code/muhammadhabilaswad/cnn-plant-health-classification-greenpoint)|
 
 ---
 
 ## 🔧 Features Not Yet Implemented
 
-- Certificate generation for plant classifications
+- Certificate generation
 - Like button for user images
 - Google login integration
 - Email verification on registration

@@ -1,36 +1,49 @@
 # 🌱 GreenPoint
 
-GreenPoint adalah platform digital yang memungkinkan pengguna mengunggah dan mengelola foto-foto mereka yang nantinya akan dideteksi dengan model CNN (Convolutional Neural Network) untuk diklasifikasi sebagai Sehat, biasa, atau layu. Dibangun menggunakan teknologi **Next.js**, **MongoDB**, dan **Tailwind CSS**.
+**GreenPoint** is a Plant-based Social Media Website that enables users to upload, view, and manage images of their plants. These images are processed by a Convolutional Neural Network (CNN) model to classify the plant's condition as *Healthy*, *Normal*, or *Wilting*. Users receive appreciation points based on the classification. The platform is built using **Next.js**, **MongoDB**, and **Tailwind CSS**.
 
 ---
 
-## 🚀 Fitur Utama
+## 🚀 Key Features
 
-- 🖼️ Upload dan manajemen gambar oleh pengguna
-- 🖼️ Klasifikasi gambar dengan model Machine Learning
-- 🧑‍💼 Halaman admin untuk mengelola semua akun dan gambar pengguna
-- 🔍 Halaman untuk melihat gambar seluruh pengguna
-- 🔍 Filter gambar berdasarkan nama tanaman atau nama pengguna
-- 🌓 Tampilan UI modern, responsif, dan ramah pengguna
-- 🌓 Chatbot dengan model Meta Llama 3.3 yang dapat menjawab pertanyaan mengenai tanaman
-
----
-
-## 🧪 Akun Demo
-
-### 👤 User
-- **Email**: `habil@gmail.com`  
-- **Password**: `habil@gmail.com`
-
-### 👨‍💼 Admin
-- **Email**: `admin@gmail.com`  
-- **Password**: `admin@gmail.com`
-
-> Akun ini dapat digunakan untuk eksplorasi dan pengujian seluruh fitur.
+| Feature                                | Description                                                                 |
+|----------------------------------------|-----------------------------------------------------------------------------|
+| Image Upload and Management            | Users can upload and manage photos of their plants                          |
+| Image Classification                   | CNN model classifies each image into Healthy, Normal, or Wilting categories |
+| Admin Dashboard                        | Admins can manage all user accounts and uploaded images                     |
+| Global Gallery                         | View all uploaded plant images from all users                               |
+| Advanced Filtering                     | Filter images based on plant name or uploader’s name                        |
+| Responsive Modern UI                   | Clean, modern, and mobile-friendly user interface                           |
+| Plant Chatbot                          | Chatbot powered by Meta Llama 3.3 to answer plant-related queries           |
 
 ---
 
-## Deployment
-- Deployment website : https://green-point-ten.vercel.app/
-- Repo model machine learning : https://github.com/mhabilaswad/greenpoint-cnn-model
-- Server machine learning : https://greenpoint-cnn-model-production.up.railway.app/
+## 🧪 Demo Accounts
+
+| Role  | Email              | Password          |
+|-------|--------------------|-------------------|
+| User  | habil@gmail.com    | habil@gmail.com   |
+| Admin | admin@gmail.com    | admin@gmail.com   |
+
+> You can use these accounts to explore and test all available features.
+
+---
+
+## 🌐 Deployment
+
+| Component               | Link                                                                 |
+|-------------------------|----------------------------------------------------------------------|
+| Website (Frontend)      | [GreenPoint on Vercel](https://green-point-ten.vercel.app/)          |
+| CNN Model Repository    | [greenpoint-cnn-model on GitHub](https://github.com/mhabilaswad/greenpoint-cnn-model) |
+| ML Server Deployment    | [CNN Model API on Railway](https://greenpoint-cnn-model-production.up.railway.app/) |
+
+---
+
+## 🔧 Features Not Yet Implemented
+
+- Certificate generation for plant classifications
+- Like button for user images
+- Google login integration
+- Email verification on registration
+- Password recovery (Forgot Password)
+- Comments on other users’ images

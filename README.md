@@ -33,7 +33,7 @@
 
 | Component               | Link                                                                 |
 |-------------------------|----------------------------------------------------------------------|
-| Website (Frontend)      | [GreenPoint on Vercel](https://green-point-ten.vercel.app/)          |
+| Website                 | [GreenPoint on Vercel](https://green-point-ten.vercel.app/)          |
 | CNN Model Repository    | [greenpoint-cnn-model on GitHub](https://github.com/mhabilaswad/greenpoint-cnn-model) |
 | ML Server Deployment    | [CNN Model API on Railway](https://greenpoint-cnn-model-production.up.railway.app/) |
 
